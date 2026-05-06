@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <string>
 #include <ctime>
+#include <sstream>
 
 using namespace std;
 
@@ -28,10 +29,10 @@ private:
         int left = leftChild(index);
         int right = rightChild(index);
         
-        if (left < heap.size() && heap[left] < heap[smallest])
+        if (left < (int)heap.size() && heap[left] < heap[smallest])
             smallest = left;
         
-        if (right < heap.size() && heap[right] < heap[smallest])
+        if (right < (int)heap.size() && heap[right] < heap[smallest])
             smallest = right;
         
         if (smallest != index) {
@@ -42,7 +43,7 @@ private:
     
     int getHeight() {
         if (heap.empty()) return 0;
-        return (int)log2(heap.size()) + 1;
+        return (int)log2((double)heap.size()) + 1;
     }
     
     void printSpaces(int count) {
@@ -65,7 +66,7 @@ public:
     
     void insert(T value) {
         heap.push_back(value);
-        heapifyUp(heap.size() - 1);
+        heapifyUp((int)heap.size() - 1);
     }
     
     T getMin() {
@@ -79,7 +80,7 @@ public:
             throw runtime_error("Heap is empty");
         
         T maxVal = heap[0];
-        for (int i = heap.size() / 2; i < heap.size(); i++) {
+        for (int i = (int)heap.size() / 2; i < (int)heap.size(); i++) {
             if (heap[i] > maxVal)
                 maxVal = heap[i];
         }
@@ -105,7 +106,7 @@ public:
             throw runtime_error("Heap is empty");
         
         int maxIndex = 0;
-        for (int i = heap.size() / 2; i < heap.size(); i++) {
+        for (int i = (int)heap.size() / 2; i < (int)heap.size(); i++) {
             if (heap[i] > heap[maxIndex])
                 maxIndex = i;
         }
@@ -115,7 +116,7 @@ public:
         heap[maxIndex] = heap.back();
         heap.pop_back();
         
-        if (maxIndex < heap.size()) {
+        if (maxIndex < (int)heap.size()) {
             if (maxIndex > 0 && heap[parent(maxIndex)] > heap[maxIndex])
                 heapifyUp(maxIndex);
             else
@@ -126,7 +127,7 @@ public:
     }
     
     void decreaseKey(int index, T newValue) {
-        if (index >= heap.size())
+        if (index >= (int)heap.size())
             throw runtime_error("Index out of range");
         if (newValue > heap[index])
             throw runtime_error("New value is greater than current value");
@@ -136,7 +137,7 @@ public:
     }
     
     void increaseKey(int index, T newValue) {
-        if (index >= heap.size())
+        if (index >= (int)heap.size())
             throw runtime_error("Index out of range");
         if (newValue < heap[index])
             throw runtime_error("New value is smaller than current value");
@@ -147,7 +148,7 @@ public:
     
     void buildHeap(vector<T> arr) {
         heap = arr;
-        for (int i = heap.size() / 2 - 1; i >= 0; i--) {
+        for (int i = (int)heap.size() / 2 - 1; i >= 0; i--) {
             heapifyDown(i);
         }
     }
@@ -158,7 +159,7 @@ public:
         }
     }
     
-    int size() { return heap.size(); }
+    int size() { return (int)heap.size(); }
     bool empty() { return heap.empty(); }
     
     void display() {
@@ -168,22 +169,22 @@ public:
         }
         
         int height = getHeight();
-        int maxWidth = pow(2, height) * 4;
+        int maxWidth = (int)pow(2.0, height) * 4;
         
         vector<vector<string>> levels(height);
         
-        for (int i = 0; i < heap.size(); i++) {
-            int level = log2(i + 1);
+        for (int i = 0; i < (int)heap.size(); i++) {
+            int level = (int)log2((double)(i + 1));
             levels[level].push_back(toString(heap[i]));
         }
         
         for (int i = 0; i < height; i++) {
-            int spaces = maxWidth / pow(2, i + 1);
+            int spaces = maxWidth / (int)pow(2.0, i + 1);
             
             printSpaces(spaces);
-            for (int j = 0; j < levels[i].size(); j++) {
+            for (int j = 0; j < (int)levels[i].size(); j++) {
                 cout << levels[i][j];
-                if (j < levels[i].size() - 1) {
+                if (j < (int)levels[i].size() - 1) {
                     printSpaces(spaces * 2);
                 }
             }
@@ -193,9 +194,9 @@ public:
     
     void displayAsList() {
         cout << "Heap as list: [";
-        for (int i = 0; i < heap.size(); i++) {
+        for (int i = 0; i < (int)heap.size(); i++) {
             cout << heap[i];
-            if (i < heap.size() - 1) cout << ", ";
+            if (i < (int)heap.size() - 1) cout << ", ";
         }
         cout << "]" << endl;
     }
@@ -240,8 +241,8 @@ public:
     }
 };
 
-void demonstrateHeap() {
-    cout << "\n=== ДЕМОНСТРАЦИЯ РАБОТЫ КУЧИ ===\n" << endl;
+int main() {
+    srand((unsigned int)time(nullptr));
     
     BinaryHeap<int> heap;
     
@@ -254,127 +255,57 @@ void demonstrateHeap() {
     heap.insert(20);
     heap.displayDetailed();
     
-    cout << "2. Поиск минимального и максимального элементов" << endl;
+    cout << "2. Поиск min и max" << endl;
     cout << "Min: " << heap.getMin() << endl;
     cout << "Max: " << heap.getMax() << endl << endl;
     
-    cout << "3. Удаление минимального элемента" << endl;
-    int minVal = heap.extractMin();
-    cout << "Удален: " << minVal << endl;
+    cout << "3. Удаление min" << endl;
+    heap.extractMin();
     heap.displayDetailed();
     
-    cout << "4. Удаление максимального элемента" << endl;
-    int maxVal = heap.extractMax();
-    cout << "Удален: " << maxVal << endl;
+    cout << "4. Удаление max" << endl;
+    heap.extractMax();
     heap.displayDetailed();
     
-    cout << "5. Изменение значений" << endl;
-    cout << "Уменьшаем элемент на позиции 1 с 8 до 2" << endl;
+    cout << "5. Уменьшение значения" << endl;
     heap.decreaseKey(1, 2);
     heap.displayDetailed();
     
-    cout << "Увеличиваем элемент на позиции 2 с 10 до 25" << endl;
+    cout << "6. Увеличение значения" << endl;
     heap.increaseKey(2, 25);
     heap.displayDetailed();
     
-    cout << "6. Слияние куч" << endl;
+    cout << "7. Слияние куч" << endl;
     BinaryHeap<int> heap2;
     heap2.insert(30);
     heap2.insert(25);
     heap2.insert(35);
-    cout << "Вторая куча: ";
-    heap2.displayAsList();
-    
     heap.merge(heap2);
-    cout << "После слияния:" << endl;
     heap.displayDetailed();
     
-    cout << "7. Построение кучи из массива [7, 12, 4, 9, 6]" << endl;
+    cout << "8. Построение кучи из массива" << endl;
     vector<int> arr = {7, 12, 4, 9, 6};
     BinaryHeap<int> heap3(arr);
     heap3.displayDetailed();
-}
-
-void taskManagerExample() {
-    cout << "\n=== ПРАКТИЧЕСКИЙ ПРИМЕР: СИСТЕМА УПРАВЛЕНИЯ ЗАДАЧАМИ ===\n" << endl;
+    
+    cout << "\n=== ПРАКТИЧЕСКИЙ ПРИМЕР: СИСТЕМА ЗАДАЧ ===\n" << endl;
     
     BinaryHeap<Task> taskHeap;
-    int nextId = 1;
     
-    cout << "Добавление задач:" << endl;
-    taskHeap.insert(Task("Срочный баг-фикс", 1, nextId++));
-    cout << "  + Срочный баг-фикс (приоритет 1)" << endl;
+    taskHeap.insert(Task("Срочный баг-фикс", 1, 1));
+    taskHeap.insert(Task("Написать документацию", 3, 2));
+    taskHeap.insert(Task("Провести код-ревью", 2, 3));
+    taskHeap.insert(Task("Деплой", 1, 4));
     
-    taskHeap.insert(Task("Написать документацию", 3, nextId++));
-    cout << "  + Написать документацию (приоритет 3)" << endl;
-    
-    taskHeap.insert(Task("Провести код-ревью", 2, nextId++));
-    cout << "  + Провести код-ревью (приоритет 2)" << endl;
-    
-    taskHeap.insert(Task("Деплой на продакшн", 1, nextId++));
-    cout << "  + Деплой на продакшн (приоритет 1)" << endl;
-    
-    taskHeap.insert(Task("Оптимизация БД", 4, nextId++));
-    cout << "  + Оптимизация БД (приоритет 4)" << endl;
-    
-    cout << "\nТекущее состояние:" << endl;
     taskHeap.displayDetailed();
     
-    cout << "\nВыполнение задач в порядке приоритета:" << endl;
-    int taskNum = 1;
+    cout << "Выполнение задач по приоритету:" << endl;
+    int num = 1;
     while (!taskHeap.empty()) {
-        Task currentTask = taskHeap.getMin();
-        cout << taskNum++ << ". Выполняется: " << currentTask << endl;
+        Task t = taskHeap.getMin();
+        cout << num++ << ". " << t << endl;
         taskHeap.extractMin();
     }
-}
-
-void extendedDemo() {
-    cout << "\n=== РАСШИРЕННАЯ ДЕМОНСТРАЦИЯ ===\n" << endl;
-    
-    cout << "Куча с double значениями:" << endl;
-    BinaryHeap<double> doubleHeap;
-    doubleHeap.insert(3.14);
-    doubleHeap.insert(2.71);
-    doubleHeap.insert(1.41);
-    doubleHeap.insert(1.73);
-    doubleHeap.displayDetailed();
-    
-    cout << "Куча со строками:" << endl;
-    BinaryHeap<string> stringHeap;
-    stringHeap.insert("apple");
-    stringHeap.insert("banana");
-    stringHeap.insert("cherry");
-    stringHeap.insert("date");
-    stringHeap.insert("elderberry");
-    stringHeap.displayDetailed();
-    
-    BinaryHeap<int> testHeap;
-    
-    cout << "Тестирование массового добавления:" << endl;
-    for (int i = 0; i < 10; i++) {
-        int val = rand() % 100;
-        testHeap.insert(val);
-        cout << "Добавлено: " << val << " -> ";
-        testHeap.displayAsList();
-    }
-    
-    cout << "\nКонечное состояние:" << endl;
-    testHeap.displayDetailed();
-    
-    cout << "Извлечение всех элементов в порядке возрастания:" << endl;
-    while (!testHeap.empty()) {
-        cout << testHeap.extractMin() << " ";
-    }
-    cout << endl;
-}
-
-int main() {
-    srand(time(nullptr));
-    
-    demonstrateHeap();
-    taskManagerExample();
-    extendedDemo();
     
     return 0;
 }
